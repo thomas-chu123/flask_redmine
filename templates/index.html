@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %}</title>
+</head>
+<body>
+    Redmine Ticket List:
+    <br>
+    <textarea rows = "10" cols = "75" name = "Redmine Ticket List">
+    Input ticket ID here...
+    </textarea>
+    <br>
+    Model :
+    <br>
+    <select id="sel" size="11" multiple="multiple" width="200">
+        {% for model in models %}
+            <option>{{ model }}</option>
+        {% endfor %}
+    </select>
+    <br>
+    Target Version:
+    <br>
+    <input type="button" value="Copy" onClick="index.html">
+</body>
+</html>
