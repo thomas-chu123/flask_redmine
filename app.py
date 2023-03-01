@@ -1,112 +1,21 @@
 from flask import Flask, render_template, request, redirect
 from redminelib import Redmine
-# import tkinter as tk
-# import tkinter.filedialog as fd
-# import tkinter.messagebox as msgbox
-# from tkinter import ttk
 import logging
 import datetime
 import sys, os
 import copy
 
 output_logging = 20
-
 app = Flask(__name__)
 
-
-@app.route('/')
-def hello_world():
-    models = []
-    models = query_model()
-    # return model_list
-    return render_template('index.html', models=models)
-
-
-def query_model():
-    redmine_version = '3.4.6-stable'
-    key = '9e162fa25b0267706cd589c99817b66403a8edfe'
-    server = 'http://172.20.0.37'
-    redmine_server = Redmine(server, key=key, version=redmine_version)
-
-    name_list = []
-    select_model = ["VMG", "DX", "AX", "EX", "WX", "PX", "PE", "EE"]
-    # issues = redmine.issue.filter(project_id='Telefonica', tracker_id=1, status_id='*')
-    # ticket = redmine.issue.get(126600)
-    model_field = redmine_server.custom_field.get(14)
-    service_profile = redmine_server.custom_field.get(15)
-    service_type = redmine_server.custom_field.get(16)
-    model_field = redmine_server.custom_field.get()
-    new_project = redmine_server.custom_field.get(14)
-    service = []
-
-    for service in service_profile:
-        service.append(service.name)
-
-    for model in model_field.possible_values:
-        for selective in select_model:
-            if selective in model["value"]:
-                name_list.append(model["value"])
-    return name_list
-
-
-class Redmine_Copy(tk.Tk):
+class Redmine_Copy():
     def __init__(self, top=None):
         super().__init__()
 
-        redmine = ""
-        model_list = []
-        x_loc = 0.01
-        y_loc = 0.01
-        x_gap = 0.2
-        y_gap = 0.03
-
+        self.redmine = ""
+        self.model_list = []
         self.start_logging()
-        self.geometry("600x800+250+50")
-        self.title("Redmine Ticket Copy Utility v1.0 (2023/2/2)")
-
         self.redmine = self.redmine_connect()
-        self.LoopLabel = tk.Label(self, text='Redmine Ticket List:', anchor='w', justify='left')
-        self.LoopLabel.place(relx=x_loc + 0.05, rely=y_loc, height=20, width=200)
-        y_loc += y_gap
-        self.TicketList = tk.Text(self)
-        self.TicketList.place(relx=x_loc + 0.05, rely=y_loc, height=250, width=500)
-        y_loc += y_gap * 11
-        self.LoopLabel = tk.Label(self, text='Model List:', anchor='w', justify='left')
-        self.LoopLabel.place(relx=x_loc + 0.05, rely=y_loc, height=20, width=200)
-        y_loc += y_gap
-        self.ModelList = tk.Listbox(self, selectmode=tk.EXTENDED)
-        self.ModelList.place(relx=x_loc + 0.05, rely=y_loc, height=250, width=500)
-
-        model_list = self.query_model()
-        for model in model_list:
-            self.ModelList.insert(tk.END, model)
-
-        y_loc += y_gap * 11
-
-        self.version_list = []
-        self.version_dict = []
-        self.version_dict = self.query_version()
-        for version in self.version_dict:
-            self.version_list.append(version["name"])
-
-        self.TargetVersion_Label = tk.Label(self, text='Target:')
-        self.TargetVersion_Label.place(relx=x_loc - 0.1, rely=y_loc, height=32, width=250)
-        self.TargetVersion = ttk.Combobox(self, width=600, values=self.version_list)
-        self.TargetVersion.current(0)
-        self.TargetVersion.place(relx=x_loc + x_gap, rely=y_loc, height=32, width=400)
-        # self.TestType.bind("<<ComboboxSelected>>", self.test_profile_change)
-
-        x_loc = 0.05
-        y_loc += y_gap * 2
-        self.StartButton = tk.Button(self, pady="0", text='Copy', command=self.start_copy)
-        self.StartButton.place(relx=x_loc, rely=y_loc, height=31, width=150)
-
-        # Configure the scrollbars
-        # self.ResponseText = tk.Text(self, font=("Helvetica", 8))
-        # self.ResponseText.place(relx=x_loc + 0.05, rely=y_loc, height=250, width=800)
-        # self.ScrollBar = tk.Scrollbar(self.ResponseText)
-        # self.ScrollBar.pack(side=tk.RIGHT, fill=tk.Y)
-        # self.ScrollBar.config(command=self.ResponseText.yview)
 
     def query_version(self):
         version_list = []
@@ -123,8 +32,8 @@ class Redmine_Copy(tk.Tk):
         redmine_version = '3.4.6-stable'
         key = '9e162fa25b0267706cd589c99817b66403a8edfe'
         server = 'http://172.20.0.37'
-        redmine = Redmine(server, key=key, version=redmine_version)
-        return redmine
+        self.redmine = Redmine(server, key=key, version=redmine_version)
+        return
 
     def query_model(self):
         name_list = []
@@ -132,6 +41,27 @@ class Redmine_Copy(tk.Tk):
         # issues = redmine.issue.filter(project_id='Telefonica', tracker_id=1, status_id='*')
         # ticket = redmine.issue.get(126600)
         model_field = self.redmine.custom_field.get(14)
+        for model in model_field.possible_values:
+            for selective in select_model:
+                if selective in model["value"]:
+                    name_list.append(model["value"])
+        return name_list
+
+    def query_model_test(self):
+        redmine_version = '3.4.6-stable'
+        key = '9e162fa25b0267706cd589c99817b66403a8edfe'
+        server = 'http://172.20.0.37'
+        redmine_server = Redmine(server, key=key, version=redmine_version)
+
+        name_list = []
+        select_model = ["VMG", "DX", "AX", "EX", "WX", "PX", "PE", "EE"]
+        # issues = redmine.issue.filter(project_id='Telefonica', tracker_id=1, status_id='*')
+        # ticket = redmine.issue.get(126600)
+        model_field = redmine_server.custom_field.get(14)
+
+        for service in service_profile:
+            service.append(service.name)
+
         for model in model_field.possible_values:
             for selective in select_model:
                 if selective in model["value"]:
@@ -254,6 +184,24 @@ class Redmine_Copy(tk.Tk):
         else:
             val = level
         return int(val)
+
+@app.route('/')
+def index_page():
+    model_list = []
+    version_list = []
+    version_dict = []
+
+    Redmine_Copy()
+    model_list = Redmine_Copy.query_models()
+
+    for model in model_list:
+        self.ModelList.insert(tk.END, model)
+
+    version_dict = self.query_version()
+    for version in self.version_dict:
+        self.version_list.append(version["name"])
+
+    return render_template('index.html', models=model_list, versions=version_list)
 
 
 if __name__ == '__main__':
