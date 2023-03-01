@@ -5,22 +5,25 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-    Redmine Ticket List:
-    <br>
+    <h1>Redmine Ticket Copy Service</h1>
+    <h3>Redmine Ticket List:</h3>
     <textarea rows = "10" cols = "75" name = "Redmine Ticket List">
     Input ticket ID here...
     </textarea>
+    <h3>Model:</h3>
+        <select id="model" size="20" multiple="multiple" width="200">
+            {% for model in models %}
+                <option>{{ model }}</option>
+            {% endfor %}
+        </select>
     <br>
-    Model :
-    <br>
-    <select id="sel" size="11" multiple="multiple" width="200">
+    <h3>Target Version:</h3>
+        <select id="target_version" size="10" multiple="multiple" width="200">
         {% for model in models %}
             <option>{{ model }}</option>
         {% endfor %}
-    </select>
-    <br>
-    Target Version:
-    <br>
+        </select>
+    <p></p>
     <input type="button" value="Copy" onClick="index.html">
 </body>
 </html>
