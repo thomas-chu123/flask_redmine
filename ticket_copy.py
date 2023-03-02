@@ -117,6 +117,9 @@ class Redmine_Copy(tk.Tk):
                 version_id = version["id"]
                 break
 
+        // create a function to copy ticket
+        def copy_ticket(ticket_content, model_list, target_version_name, version_id):
+
         #print (tickets)
         for ticket in ticket_list:
             if ticket !="":

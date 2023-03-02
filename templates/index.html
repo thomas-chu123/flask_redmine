@@ -5,25 +5,26 @@
     <title>{% block title %}{% endblock %}</title>
 </head>
 <body>
-    <h1>Redmine Ticket Copy Service</h1>
-    <h3>Redmine Ticket List:</h3>
-    <textarea rows = "10" cols = "75" name = "Redmine Ticket List">
-    Input ticket ID here...
-    </textarea>
-    <h3>Model:</h3>
-        <select id="model" size="20" multiple="multiple" width="200">
-            {% for model in models %}
-                <option>{{ model }}</option>
+    <div style="background-color: #628DB6;color: #F8F8F8;padding: 10px;">
+        <h1><b>Redmine Ticket Copy Tool</b></h1>
+    </div>
+
+    <form method="POST"  action="{{  url_for('submit') }}">
+        <label for="ticket_list">Redmine Ticket List:</label><br />
+        <textarea id="ticket_list" rows = "10" cols = "70" name="ticket_list"></textarea><br />
+        <label for="model_list">Model:</label><br />
+            <select id="model_list" name="model_list" size="20" multiple="multiple">
+                {% for model in models %}
+                    <option>{{ model }}</option>
+                {% endfor %}
+            </select><br />
+        <label for="target_version">Target Version:</label><br />
+            <select id="target_version" name="target_version" size="10">
+            {% for version in versions %}
+                <option>{{ version }}</option>
             {% endfor %}
-        </select>
-    <br>
-    <h3>Target Version:</h3>
-        <select id="target_version" size="10" multiple="multiple" width="200">
-        {% for model in models %}
-            <option>{{ model }}</option>
-        {% endfor %}
-        </select>
-    <p></p>
-    <input type="button" value="Copy" onClick="index.html">
+            </select><br />
+        <input type="submit" value="Submit">
+    </form>
 </body>
 </html>
