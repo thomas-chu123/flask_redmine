@@ -144,8 +144,8 @@ def submit():
             try:
                 ticket_content = redmine.issue.get(int(ticket))
             except Exception as e:
-                result_list.append("Copy ticket from ID#" + ticket_content.id + "  on model#" + model + "  is failed on new ID#"
-                                   + issue.id + " , target:" + selected_target_version + " , reason:" + e)
+                result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model + "  is failed on new ID#"
+                                   + str(issue.id) + " , target:" + selected_target_version + " , reason:" + e)
                 continue
 
             for item in ticket_content.attachments:
@@ -163,7 +163,7 @@ def submit():
                 if ticket_model_name == model:
                     logging.info("Copy ticket from ID#%s on model#%s is failed, target:%s, reason: exist model", \
                                  ticket_content.id, model, selected_target_version)
-                    result_list.append("Copy ticket from ID#" + ticket_content.id + "  on model#" + model + "  is failed, target:" +
+                    result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model + "  is failed, target:" +
                                        selected_target_version + " , reason: exist model")
                     continue
                 else:
@@ -187,8 +187,8 @@ def submit():
                         logging.info(
                             "Copy ticket from ID#%s on model#%s is failed on new ID#%s, target:%s, reason:%s", \
                             ticket_content.id, model, issue.id, selected_target_version, e)
-                        result_list.append("Copy ticket from ID#" + ticket_content.id + "  on model#" + model +
-                                           "  is failed on new ID#" + issue.id + " , target:" + selected_target_version + " , reason:" + e)
+                        result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model +
+                                           "  is failed on new ID#" + str(issue.id) + " , target:" + selected_target_version + " , reason:" + e)
                         continue
 
                     issue.priority_id = priority_convert(ticket_content['priority']['id'])
@@ -209,15 +209,15 @@ def submit():
 
                         logging.info("Copy ticket from ID#%s on model#%s is created on new ID#%s, target:%s", \
                                      ticket_content.id, model, issue.id, selected_target_version)
-                        result_list.append("Copy ticket from ID#" + ticket_content.id + "  on model#" + model + "  is created on new ID#" +
-                                           issue.id + " , target:" + selected_target_version)
+                        result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model + "  is created on new ID#" +
+                                           str(issue.id) + " , target:" + selected_target_version)
                     except Exception as e:
                         # print(e)
                         logging.info(
                             "Copy ticket from ID#%s on model#%s is failed on new ID#%s, target:%s, reason:%s", \
                             ticket_content.id, model, issue.id, selected_target_version, e)
-                        result_list.append("Copy ticket from ID#" + ticket_content.id + "  on model#" + model +
-                                           "  is failed on new ID#" + issue.id + " , target:" + selected_target_version + " , reason:" + e)
+                        result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model +
+                                           "  is failed on new ID#" + str(issue.id) + " , target:" + selected_target_version + " , reason:" + e)
                         continue
         # path = os. getcwd()
         for file in file_list:
