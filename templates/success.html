@@ -3,12 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <title>Redmine</title>
+    <link rel="stylesheet" type="text/css" href="/static/bootstrap/css/bootstrap.min.css">
+    <script src="/static/bootstrap/js/bootstrap.min.js"></script>
 </head>
 <body>
     <div style="background-color: #628DB6;color: #F8F8F8;padding: 10px;">
         <h1><b>Redmine Ticket Copy Tool</b></h1>
     </div>
-    <p>Copy Result</p>
-
+    <h3>Copy Redmine Ticket is Finished and Below is the Result:</h3>
+    <table border="1" class="table table-bordered">
+    <tr>
+        <th>Detail Log:</th>
+    </tr>
+    <tr>
+        {% for result in results %}
+            <td>{{ result }}</td>
+        {% endfor %}
+    </tr>
+    </table>
+    <form method="get" action="{{ url_for('index_page') }}">
+        <input type="submit" class="btn btn-primary"  value="Return">
+    </form>
 </body>
 </html>

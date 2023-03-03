@@ -52,9 +52,9 @@ def get_model_list():
 
 def get_version_list():
     global redmine, version_list, version_dict
-    versions = redmine.version.filter(project_id="emea-bu-bug-report")
+    # versions = redmine.version.filter(project_id="emea-bu-bug-report")
     # for testing
-    # versions = redmine.version.filter(project_id="redmine-evaluatoin")
+    versions = redmine.version.filter(project_id="redmine-evaluatoin")
     for version_id in versions:
         if "OPAL" in version_id.name or "opal" in version_id.name:
             version_dict.append({"name": version_id.name, "id": version_id.id})
@@ -95,22 +95,38 @@ def priority_convert(level):
     return int(val)
 
 
-@app.route('/')
+@app.route('/', methods=['GET','POST'])
 def index_page():
     global redmine, model_list, version_list, version_dict
+
+    redmine = ""
+    model_list = []
+    version_list = []
+    version_dict = []
     start_logging()
     connect_redmine()
     get_model_list()
     get_version_list()
+    redmine = ""
 
     return render_template('index.html', models=model_list, versions=version_list)
 
 
-@app.route('/submit', methods=['POST'])
+@app.route('/submit', methods=['GET','POST'])
 def submit():
+    result_list = []
     global redmine, model_list, version_list, version_dict
-    if redmine==None or redmine=="":
-        return redirect('/')
+    #if redmine==None or redmine=="":
+    # redmine = ""
+    # model_list = []
+    # version_list = []
+    # version_dict = []
+
+        # start_logging()
+    connect_redmine()
+        # get_model_list()
+        # get_version_list()
+        # return redirect('/')
 
     selected_ticket_list = request.form['ticket_list'].replace("\r", "").split("\n")
     selected_model_list = request.form.getlist('model_list')
@@ -125,7 +141,11 @@ def submit():
 
     for ticket in selected_ticket_list:
         if ticket != "":
-            ticket_content = redmine.issue.get(int(ticket))
+            try:
+                ticket_content = redmine.issue.get(int(ticket))
+            except Exception as e:
+                result_list.append(f"Copy ticket from ID#{ticket_content.id} on model#{model} is failed on new ID#{issue.id}, target:{selected_target_version}, reason:{e}")
+                continue
 
             for item in ticket_content.attachments:
                 filepath = item.download(savepath=os.getcwd(), filename=item.filename)
@@ -137,10 +157,12 @@ def submit():
                     ticket_model_name = ticket_content.custom_fields.get(14)['value'][0]
                 except Exception as e:
                     ticket_model_name = ""
+                    continue
 
                 if ticket_model_name == model:
                     logging.info("Copy ticket from ID#%s on model#%s is failed, target:%s, reason: exist model", \
                                  ticket_content.id, model, selected_target_version)
+                    result_list.append(f"Copy ticket from ID#{ticket_content.id} on model#{model} is failed, target:{selected_target_version}, reason: exist model")
                     continue
                 else:
                     issue = redmine.issue.new()
@@ -163,6 +185,7 @@ def submit():
                         logging.info(
                             "Copy ticket from ID#%s on model#%s is failed on new ID#%s, target:%s, reason:%s", \
                             ticket_content.id, model, issue.id, selected_target_version, e)
+                        result_list.append(f"Copy ticket from ID#{ticket_content.id} on model#{model} is failed on new ID#{issue.id}, target:{selected_target_version}, reason:{e}")
                         continue
 
                     issue.priority_id = priority_convert(ticket_content['priority']['id'])
@@ -183,16 +206,22 @@ def submit():
 
                         logging.info("Copy ticket from ID#%s on model#%s is created on new ID#%s, target:%s", \
                                      ticket_content.id, model, issue.id, selected_target_version)
+                        result_list.append(f"Copy ticket from ID#{ticket_content.id} on model#{model} is created on new ID#{issue.id}, target:{selected_target_version}")
                     except Exception as e:
                         # print(e)
                         logging.info(
                             "Copy ticket from ID#%s on model#%s is failed on new ID#%s, target:%s, reason:%s", \
                             ticket_content.id, model, issue.id, selected_target_version, e)
+                        result_list.append(f"Copy ticket from ID#{ticket_content.id} on model#{model} is failed on new ID#{issue.id}, target:{selected_target_version}, reason:{e}")
                         continue
         # path = os. getcwd()
         for file in file_list:
             os.remove(os.getcwd() + "/" + file['filename'])
-    return "Copy Ticket Is Finished"
+    # redmine = ""
+    # model_list = []
+    # version_list = []
+    # version_dict = []
+    return render_template("success.html", results=result_list)
 
 
 if __name__ == '__main__':
