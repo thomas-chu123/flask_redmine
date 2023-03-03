@@ -158,7 +158,6 @@ def submit():
                     ticket_model_name = ticket_content.custom_fields.get(14)['value'][0]
                 except Exception as e:
                     ticket_model_name = ""
-                    continue
 
                 if ticket_model_name == model:
                     logging.info("Copy ticket from ID#%s on model#%s is failed, target:%s, reason: exist model", \
