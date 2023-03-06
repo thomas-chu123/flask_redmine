@@ -10,16 +10,26 @@
     <div style="background-color: #628DB6;color: #F8F8F8;padding: 10px;">
         <h1><b>Redmine Ticket Copy Tool</b></h1>
     </div>
-    <h3>Copy Redmine Ticket is Finished and Below is the Result:</h3>
-    <table border="1" class="table table-bordered">
+    <h3>Copy Results:</h3>
+    <table border="1" class="table table-bordered col-md-10">
     <tr>
-        <th>Detail Log:</th>
+        <th>From Redmine ID#</th>
+        <th>To Redmine ID#</th>
+        <th>Model Name</th>
+        <th>Target Version</th>
+        <th>Copy Result</th>
+        <th>Fail Reason</th>
     </tr>
-    <tr>
-        {% for result in results %}
-            <td>{{ result }}</td>
-        {% endfor %}
-    </tr>
+    {% for result in results %}
+        <tr>
+            <td>{{ result['from_id'] }}</td>
+            <td>{{ result['to_id'] }}</td>
+            <td>{{ result['to_model'] }}</td>
+            <td>{{ result['target_version'] }}</td>
+            <td>{{ result['result'] }}</td>
+            <td>{{ result['fail_reason'] }}</td>
+        </tr>
+    {% endfor %}
     </table>
     <form method="get" action="{{ url_for('index_page') }}">
         <input type="submit" class="btn btn-primary"  value="Return">

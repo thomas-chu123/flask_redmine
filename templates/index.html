@@ -15,11 +15,11 @@
     </div>
 
     <form method="POST"  action="{{  url_for('submit') }}">
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-6">
             <label for="ticket_list">Redmine Ticket List:</label><br />
             <textarea class="form-control rounded border" id="ticket_list" rows = "10" cols = "70" name="ticket_list"></textarea><br />
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-6">
             <label for="model_list">Model:</label><br />
             <select class="form-control custom-select rounded border" id="model_list" name="model_list" size="20" multiple="multiple">
                 {% for model in models %}
@@ -27,13 +27,17 @@
                 {% endfor %}
             </select><br />
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-6">
             <label for="target_version">Target Version:</label><br />
             <select class="form-control custom-select rounded border" id="target_version" name="target_version" size="10">
             {% for version in versions %}
                 <option>{{ version }}</option>
             {% endfor %}
             </select><br />
+        </div>
+        <div class="form-group col-md-6">
+            <label for="new_version">New Version</label><br />
+            <input type="text" class="col-md-8"   id="new_version_name" name="new_version_name">
         </div>
         <input type="submit" class="btn btn-primary"  value="Submit">
     </form>

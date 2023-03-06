@@ -5,6 +5,13 @@ import datetime
 import sys, os
 import copy
 
+from requests.packages import target
+
+# testing
+# target_project_name = "redmine-evaluatoin"
+# deployment
+target_project_name = "emea-bu-bug-report"
+
 redmine = ""
 model_list = []
 version_list = []
@@ -52,13 +59,14 @@ def get_model_list():
 
 def get_version_list():
     global redmine, version_list, version_dict
+    global target_project_name
     # versions = redmine.version.filter(project_id="emea-bu-bug-report")
     # for testing
-    versions = redmine.version.filter(project_id="redmine-evaluatoin")
+    versions = redmine.version.filter(project_id=target_project_name)
     for version_id in versions:
-        if "OPAL" in version_id.name or "opal" in version_id.name:
-            version_dict.append({"name": version_id.name, "id": version_id.id})
-            version_list.append(version_id.name)
+        # if "OPAL" in version_id.name or "opal" in version_id.name:
+        version_dict.append({"name": version_id.name, "id": version_id.id})
+        version_list.append(version_id.name)
 
 
 def query_model_test():
@@ -116,6 +124,7 @@ def index_page():
 def submit():
     result_list = []
     global redmine, model_list, version_list, version_dict
+    global target_project_name
     # if redmine==None or redmine=="":
     # redmine = ""
     # model_list = []
@@ -131,21 +140,41 @@ def submit():
     selected_ticket_list = request.form['ticket_list'].replace("\r", "").split("\n")
     selected_model_list = request.form.getlist('model_list')
     selected_target_version = request.form['target_version']
+    new_version_name = request.form['new_version_name']
     file_list = []
 
     selected_version_id = 0
-    for version in version_dict:
-        if selected_target_version == version["name"]:
-            selected_version_id = version["id"]
-            break
+
+    if new_version_name != "":
+        try:
+            new_version_obj = redmine.version.create(project_id=target_project_name, name=new_version_name)
+            selected_version_id = new_version_obj.id
+        except Exception as e:
+            if "Name has already been taken" in repr(e):
+                for version in version_dict:
+                    if new_version_name == version["name"]:
+                        selected_version_id = version["id"]
+                        selected_target_version = new_version_name
+                        break
+            print(repr(e))
+
+    else:
+        for version in version_dict:
+            if selected_target_version == version["name"]:
+                selected_version_id = version["id"]
+                break
 
     for ticket in selected_ticket_list:
         if ticket != "":
             try:
                 ticket_content = redmine.issue.get(int(ticket))
             except Exception as e:
-                result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model + "  is failed on new ID#"
-                                   + str(issue.id) + " , target:" + selected_target_version + " , reason:" + e)
+                result_list.append({"from_id" : str(ticket_content.id),
+                                    "to_id" : str(issue.id),
+                                    "to_model" : model,
+                                    "result" : "failed",
+                                    "target_version" : selected_target_version,
+                                    "fail_reason" : repr(e)})
                 continue
 
             for item in ticket_content.attachments:
@@ -162,8 +191,14 @@ def submit():
                 if ticket_model_name == model:
                     logging.info("Copy ticket from ID#%s on model#%s is failed, target:%s, reason: exist model", \
                                  ticket_content.id, model, selected_target_version)
-                    result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model + "  is failed, target:" +
-                                       selected_target_version + " , reason: exist model")
+
+                    result_list.append({"from_id": str(ticket_content.id),
+                                        "to_id": str(issue.id),
+                                        "to_model": model,
+                                        "result": "failed",
+                                        "target_version": selected_target_version,
+                                        "fail_reason": "exist model name"})
+
                     continue
                 else:
                     issue = redmine.issue.new()
@@ -186,8 +221,13 @@ def submit():
                         logging.info(
                             "Copy ticket from ID#%s on model#%s is failed on new ID#%s, target:%s, reason:%s", \
                             ticket_content.id, model, issue.id, selected_target_version, e)
-                        result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model +
-                                           "  is failed on new ID#" + str(issue.id) + " , target:" + selected_target_version + " , reason:" + e)
+
+                        result_list.append({"from_id": str(ticket_content.id),
+                                            "to_id": str(issue.id),
+                                            "to_model": model,
+                                            "result": "failed",
+                                            "target_version": selected_target_version,
+                                            "fail_reason": repr(e)})
                         continue
 
                     issue.priority_id = priority_convert(ticket_content['priority']['id'])
@@ -208,18 +248,29 @@ def submit():
 
                         logging.info("Copy ticket from ID#%s on model#%s is created on new ID#%s, target:%s", \
                                      ticket_content.id, model, issue.id, selected_target_version)
-                        result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model + "  is created on new ID#" +
-                                           str(issue.id) + " , target:" + selected_target_version)
+
+                        result_list.append({"from_id": str(ticket_content.id),
+                                            "to_id": str(issue.id),
+                                            "to_model": model,
+                                            "result": "success",
+                                            "target_version": selected_target_version,
+                                            "fail_reason": "N/A"})
+
                     except Exception as e:
                         # print(e)
                         logging.info(
                             "Copy ticket from ID#%s on model#%s is failed on new ID#%s, target:%s, reason:%s", \
                             ticket_content.id, model, issue.id, selected_target_version, e)
-                        result_list.append("Copy ticket from ID#" + str(ticket_content.id) + "  on model#" + model +
-                                           "  is failed on new ID#" + str(issue.id) + " , target:" + selected_target_version + " , reason:" + e)
+
+                        result_list.append({"from_id": str(ticket_content.id),
+                                            "to_id": str(issue.id),
+                                            "to_model": model,
+                                            "result": "failed",
+                                            "target_version": selected_target_version,
+                                            "reason": repr(e)})
                         continue
-        # path = os. getcwd()
-        for file in file_list:
+            # path = os. getcwd()
+    for     file in file_list:
             os.remove(os.getcwd() + "/" + file['filename'])
     # redmine = ""
     # model_list = []
