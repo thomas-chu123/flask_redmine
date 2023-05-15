@@ -62,16 +62,20 @@ def get_version_list(redmine_server):
     try:
         versions = redmine_server.version.filter(project_id=target_project_name)
         for version_id in versions:
-            # if "OPAL" in version_id.name or "opal" in version_id.name:
-            version_dict.append({"name": version_id.name, "id": version_id.id})
-            version_list.append(version_id.name)
+            if version_id.status != "closed":
+                # if "OPAL" in version_id.name or "opal" in version_id.name:
+                version_dict.append({"name": version_id.name, "id": version_id.id})
+                version_list.append(version_id.name)
+        version_list.sort()
     except:
         time.sleep(5)
         versions = redmine_server.version.filter(project_id=target_project_name)
         for version_id in versions:
-            # if "OPAL" in version_id.name or "opal" in version_id.name:
-            version_dict.append({"name": version_id.name, "id": version_id.id})
-            version_list.append(version_id.name)
+            if version_id.status != "closed":
+                # if "OPAL" in version_id.name or "opal" in version_id.name:
+                version_dict.append({"name": version_id.name, "id": version_id.id})
+                version_list.append(version_id.name)
+        version_list.sort()
 
 
 def query_model_test():
