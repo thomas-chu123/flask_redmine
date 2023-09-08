@@ -156,6 +156,7 @@ def submit():
                 selected_version_id = version["id"]
                 break
     for ticket in selected_ticket_list:
+        file_list = []
         if ticket != "":
             try:
                 ticket_content = redmine_server.issue.get(int(ticket))
@@ -255,12 +256,12 @@ def submit():
                         continue
                 time.sleep(1)
         time.sleep(1)
-    # path = os. getcwd()
-    try:
-        for file in file_list:
+        # path = os. getcwd()
+        try:
+            for file in file_list:
                 os.remove(os.getcwd() + "/" + file['filename'])
-    except FileNotFoundError as e:
-        logging.error("Attachment can't be deleted for ticket:%s", ticket_content.id)
+        except FileNotFoundError as e:
+            logging.error("Attachment can't be deleted for ticket:%s", ticket_content.id)
     return render_template("success.html", results=result_list)
 
 
