@@ -38,7 +38,7 @@ def start_logging():
 
 def connect_redmine():
     redmine_version = '3.4.6-stable'
-    key = '9e162fa25b0267706cd589c99817b66403a8edfe'
+    key = 'xxxx'
     server = 'http://172.20.0.37'
     redmine = Redmine(server, key=key, version=redmine_version)
     return redmine
@@ -80,7 +80,7 @@ def get_version_list(redmine_server):
 
 def query_model_test():
     redmine_version = '3.4.6-stable'
-    key = '9e162fa25b0267706cd589c99817b66403a8edfe'
+    key = 'xxxxx'
     server = 'http://172.20.0.37'
     redmine_server = Redmine(server, key=key, version=redmine_version)
 
